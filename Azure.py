@@ -2,22 +2,31 @@
 # coding: utf-8
 
 # In[47]:
-
-
 from azureml.core import Workspace, Dataset
 from azureml.data.dataset_factory import DataType
+import argparse
+from azureml.widgets import RunDetails
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-file', type=str, help='Enter CSV file ')
+parser.add_argument('-name', type=str, help='Enter Dataset name')
+args = parser.parse_args()
+
 
 subscription_id = '05ed07e3-df05-46ff-8687-8555449022bb'
 resource_group = 'ML-resources'
 workspace_name = 'ML-resources'
 workspace = Workspace(subscription_id, resource_group, workspace_name)
 
+
 datastore = workspace.get_default_datastore()
 
-datastore.upload(src_dir='data', target_path='data')
-dataset = Dataset.Tabular.from_delimited_files(path = [(datastore, ('data/C7-FPZ_train_data.csv'))])
 
-file_ds = dataset.register(workspace=workspace, name='titanic_ds',description='titanic training data')
+datastore.upload(src_dir='data', target_path='data')
+dataset = Dataset.Tabular.from_delimited_files(path = [(datastore, (f'data/{args.file}'))])
+
+file_ds = dataset.register(workspace=workspace, name=args.name, description='New Dataset Uploaded')
 
 
 # dataset = Dataset.get_by_name(workspace, name='new_csv_test')
@@ -61,7 +70,7 @@ cpu_cluster_name = "GPU-compute"
 
 try:
     compute_target = ComputeTarget(workspace=ws, name=cpu_cluster_name)
-    print("Found exsist cluster, Use it ! ")
+    print("Found exsist cluster, Using it ! ")
 except ComputeTargetException:
     compute_config = AmlCompute.provisioning_configuration(vm_size='STANDART_D2_V2', max_nodes=6)
 
@@ -108,33 +117,24 @@ remote_run = experiment.submit(automl_config, show_output = False)
 
 # In[15]:
 
-
 from azureml.widgets import RunDetails
 remote_run.wait_for_completion(show_output=True)
+print("** wait_for_completion **")
 
 
 # In[16]:
-
 
 best_run, fitted_model = remote_run.get_output()
 print(best_run)
 print(fitted_model)
 
 
-# In[17]:
-
-
-from azureml.widgets import RunDetails
-RunDetails(remote_run).show() 
-
-
 # In[18]:
 
-
-# Wait for the best model explanation run to complete
 from azureml.interpret import ExplanationClient
 from azureml.core.run import Run
 
+print("Wait for the best model explanation run to complete")
 model_explainability_run_id = remote_run.id + "_" + "ModelExplain"
 print(model_explainability_run_id)
 model_explainability_run = Run(experiment=experiment, run_id=model_explainability_run_id)
@@ -146,7 +146,6 @@ best_run, fitted_model = remote_run.get_output()
 
 # In[19]:
 
-
 from azureml.interpret import ExplanationClient
 
 client = ExplanationClient.from_run(best_run)
@@ -154,35 +153,34 @@ engineered_explanations = client.download_model_explanation(raw=True)
 exp_data = engineered_explanations.get_feature_importance_dict()
 exp_data
 
-
 # In[20]:
-
 
 best_run, fitted_model = remote_run.get_output()
 
 
 # In[21]:
-
-
+import datetime
 import os
-model_name = best_run.properties['model_name']
 
+print("** Exporting The model **")
+d_date = datetime.datetime.now()
+reg_format_date = d_date.strftime("%Y-%m-%d--%H:%M:%S")
+
+model_name = best_run.properties['model_name']
 script_file_name = 'inference/score.py'
 best_run.download_file('outputs/scoring_file_v_1_0_0.py', 'inference/score.py')
 model_dir = 'Model' # Local folder where the model will be stored temporarily
 if not os.path.isdir(model_dir):
     os.mkdir(model_dir)
     
-best_run.download_file('outputs/model.pkl', model_dir + '/model.pkl')
+best_run.download_file('outputs/model.pkl', f'{model_dir}/{args.file}-{reg_format_date}.pkl')
 
 
 # In[22]:
 
 
-description = 'AutoML Model trained on bank marketing data to predict if a client will subscribe to a term deposit'
+description = 'AutoML Model trained'
 tags = None
 model = remote_run.register_model(model_name = model_name, description = description, tags = tags)
-
-print(remote_run.model_id) # This will be written to the script file later in the notebook.
-best_run.download_file('outputs/scoring_file_v_1_0_0.py', 'inference/score.py')
+print(remote_run.model_id)
 
