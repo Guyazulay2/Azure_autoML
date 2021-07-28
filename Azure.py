@@ -183,4 +183,3 @@ description = 'AutoML Model trained'
 tags = None
 model = remote_run.register_model(model_name = model_name, description = description, tags = tags)
 print(remote_run.model_id)
-
