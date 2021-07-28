@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+    environment {
+       DIR_OUTPUT = "/home/yossi/Desktop/HappyDural/output"
+       DIR_VALS = "/home/yossi/Desktop/HappyDural/vals"
+    }
+    stages {
+        stage('Download') {
+            steps {
+                sh 'aws s3 cp --recursive s3://sshay/upload/ ${DIR_VALS}'
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'sudo docker build -t data_processing /home/yossi/Desktop/HappyDural/'
+                sh 'docker run -d --name basic_preprocessing --rm -v ${DIR_VALS}:/root/apps/vals -v ${DIR_OUTPUT}:/root/apps/output data_processing python3 /root/apps/data_preprocessing/basic_preprocessing.py -wo_lidocaine /root/apps/vals/$FILE_ONE -with_lidocaine /root/apps/vals/$FILE_TWO -parameters_file /root/apps/vals/$EXEL_FILE '
+                sh 'sleep 1.5'
+            }
+        }
+        stage('Test') {
+            steps {
+                script {
+                    if ('docker ps -aq -f status=exited -f name=data_processing') {
+                        echo "Container is running !"
+                        sh 'sleep 15m'
+                    } else {
+                        echo "Container is Exited !"
+                        currentBuild.result = 'FAILURE'
+                    }
+                }
+            }
+        }
+        stage('Upload') {
+            steps {
+                sh 'aws s3 cp ${DIR_OUTPUT} s3://sshay/output/ --recursive'
+                sh 'sudo rm ${DIR_OUTPUT}/*.csv'
+            }
+        }
+    }
+}
