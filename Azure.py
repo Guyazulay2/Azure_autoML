@@ -23,9 +23,8 @@ workspace = Workspace(subscription_id, resource_group, workspace_name)
 datastore = workspace.get_default_datastore()
 
 
-datastore.upload(src_dir='data', target_path='data')
+datastore.upload(src_dir='data/', target_path=f'data/{args.file}')
 dataset = Dataset.Tabular.from_delimited_files(path = [(datastore, (f'data/{args.file}'))])
-
 file_ds = dataset.register(workspace=workspace, name=args.name, description='New Dataset Uploaded')
 
 
@@ -33,7 +32,7 @@ file_ds = dataset.register(workspace=workspace, name=args.name, description='New
 # dataset.to_pandas_dataframe()
 
 
-workspace.write_config(path="/home/yossi/Desktop/new", file_name="config.json")
+workspace.write_config(path="/home/yossi/Desktop/build_model_happydural", file_name="config.json")
 print("** Finisht Upload the data **")
 
 
@@ -103,7 +102,7 @@ automl_config = AutoMLConfig(task = 'classification',
                              blocked_models=['TensorFlowLinearClassifier'],
                              label_column_name = '0',
                              training_data = dataset,
-                             n_cross_validations=2,
+                             n_cross_validations=10,
                              **automl_settings
                             )
 print("** Started now The train, whit 30 min **")
@@ -173,7 +172,7 @@ model_dir = 'Model' # Local folder where the model will be stored temporarily
 if not os.path.isdir(model_dir):
     os.mkdir(model_dir)
     
-best_run.download_file('outputs/model.pkl', f'{model_dir}/{args.file}-{reg_format_date}.pkl')
+best_run.download_file('outputs/model.pkl', f'{model_dir}/{args.file[:-4]}-{reg_format_date}.pkl')
 
 
 # In[22]:
@@ -183,3 +182,4 @@ description = 'AutoML Model trained'
 tags = None
 model = remote_run.register_model(model_name = model_name, description = description, tags = tags)
 print(remote_run.model_id)
+
