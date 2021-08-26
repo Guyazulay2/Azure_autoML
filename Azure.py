@@ -181,4 +181,9 @@ best_run.download_file('outputs/model.pkl', f'{model_dir}/{args.file[:-4]}-{reg_
 description = 'AutoML Model trained'
 tags = None
 model = remote_run.register_model(model_name = model_name, description = description, tags = tags)
+<<<<<<< HEAD
 print(remote_run.model_id)
+=======
+print(remote_run.model_id)
+
+>>>>>>> 479d5a00f88f69f84a3136a29b8857c3c8a04f72
