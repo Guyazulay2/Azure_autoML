@@ -43,8 +43,11 @@ from azureml.core.experiment import Experiment
 from azureml.core.workspace import Workspace
 import pandas as pd
 
+d_date = datetime.datetime.now()
+reg_format_date = d_date.strftime("%Y-%m-%d--%H:%M:%S")
+
 ws = Workspace.from_config()
-experiment_name = f'{args.file[:-4]}'
+experiment_name = f'{args.file[:-4]-{reg_format_date}}'
 
 experiment = Experiment(ws, experiment_name)
 
