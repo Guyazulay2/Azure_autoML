@@ -1,0 +1,257 @@
+2021-08-17 02:59:46.886 - INFO - 5443 - azureml.train.automl._local_managed_utils.is_docker_installed:354 - Docker is installed with Docker version 20.10.8, build 3967b7d
+.
+2021-08-17 02:59:46.894 - INFO - 5443 - azureml.train.automl.automlconfig._start_execution:217 - Submitting remote.
+2021-08-17 03:01:39.994 - INFO - 5443 - azureml.train.automl.run._log_activity:55 - ActivityStarted: GetOutput
+2021-08-17 03:01:40.009 - INFO - 5443 - azureml.train.automl.run._log_activity:55 - ActivityStarted: GetOutput
+2021-08-17 03:01:40.017 - INFO - 5443 - azureml.train.automl.run._log_activity:55 - ActivityStarted: GetChildren
+2021-08-17 03:01:40.654 - INFO - 5443 - azureml.train.automl.run._log_activity:55 - ActivityStarted: GetChildren
+2021-08-17 03:01:42.678 - CRITICAL - 5443 - azureml.train.automl.run.log_traceback:227 - Type: ModelMissing
+Class: AutoMLException
+Message: AutoMLException:
+	Message: Could not find a model with valid score for metric 'AUC_weighted'. Please ensure that at least one run was successfully completed with a valid score for the given metric.
+	InnerException: None
+	ErrorResponse 
+{
+    "error": {
+        "code": "UserError",
+        "message": "Could not find a model with valid score for metric 'AUC_weighted'. Please ensure that at least one run was successfully completed with a valid score for the given metric.",
+        "target": "metric",
+        "inner_error": {
+            "code": "NotFound",
+            "inner_error": {
+                "code": "ModelMissing"
+            }
+        }
+    }
+}
+Traceback:
+  File "telemetry_activity_logger.py", line 58, in _log_activity
+    yield
+  File "run.py", line 852, in _get_all_automl_child_runs
+    raise AutoMLException._with_error(AzureMLError.create(ModelMissing, target="metric", metric=metric))
+
+ExceptionTarget: metric
+2021-08-17 03:01:42.679 - INFO - 5443 - azureml.train.automl.run._log_activity:93 - ActivityCompleted: Activity=GetChildren, HowEnded=Failure, Duration=2025.07[ms]
+2021-08-17 03:01:42.679 - CRITICAL - 5443 - azureml.train.automl.run.log_traceback:227 - Type: ModelMissing
+Class: AutoMLException
+Message: AutoMLException:
+	Message: Could not find a model with valid score for metric 'AUC_weighted'. Please ensure that at least one run was successfully completed with a valid score for the given metric.
+	InnerException: None
+	ErrorResponse 
+{
+    "error": {
+        "code": "UserError",
+        "message": "Could not find a model with valid score for metric 'AUC_weighted'. Please ensure that at least one run was successfully completed with a valid score for the given metric.",
+        "target": "metric",
+        "inner_error": {
+            "code": "NotFound",
+            "inner_error": {
+                "code": "ModelMissing"
+            }
+        }
+    }
+}
+Traceback:
+  File "telemetry_activity_logger.py", line 58, in _log_activity
+    yield
+  File "run.py", line 804, in _get_run_internal
+    child_runs_and_scores = self._get_all_automl_child_runs(automl_settings.primary_metric)
+  File "run.py", line 852, in _get_all_automl_child_runs
+    raise AutoMLException._with_error(AzureMLError.create(ModelMissing, target="metric", metric=metric))
+
+ExceptionTarget: metric
+2021-08-17 03:01:42.680 - INFO - 5443 - azureml.train.automl.run._log_activity:93 - ActivityCompleted: Activity=GetChildren, HowEnded=Failure, Duration=2662.94[ms]
+2021-08-17 03:01:42.681 - CRITICAL - 5443 - azureml.train.automl.run.log_traceback:227 - Type: ModelMissing
+Class: AutoMLException
+Message: AutoMLException:
+	Message: Could not find a model with valid score for metric 'AUC_weighted'. Please ensure that at least one run was successfully completed with a valid score for the given metric.
+	InnerException: None
+	ErrorResponse 
+{
+    "error": {
+        "code": "UserError",
+        "message": "Could not find a model with valid score for metric 'AUC_weighted'. Please ensure that at least one run was successfully completed with a valid score for the given metric.",
+        "target": "metric",
+        "inner_error": {
+            "code": "NotFound",
+            "inner_error": {
+                "code": "ModelMissing"
+            }
+        }
+    }
+}
+Traceback:
+  File "telemetry_activity_logger.py", line 58, in _log_activity
+    yield
+  File "run.py", line 640, in _get_best_child_run
+    curr_run = self._get_run_internal(iteration, metric, "get_output")
+  File "run.py", line 804, in _get_run_internal
+    child_runs_and_scores = self._get_all_automl_child_runs(automl_settings.primary_metric)
+  File "run.py", line 852, in _get_all_automl_child_runs
+    raise AutoMLException._with_error(AzureMLError.create(ModelMissing, target="metric", metric=metric))
+
+ExceptionTarget: metric
+2021-08-17 03:01:42.681 - INFO - 5443 - azureml.train.automl.run._log_activity:93 - ActivityCompleted: Activity=GetOutput, HowEnded=Failure, Duration=2672.34[ms]
+2021-08-17 03:01:42.682 - CRITICAL - 5443 - azureml.train.automl.run.log_traceback:227 - Type: ModelMissing
+Class: AutoMLException
+Message: AutoMLException:
+	Message: Could not find a model with valid score for metric 'AUC_weighted'. Please ensure that at least one run was successfully completed with a valid score for the given metric.
+	InnerException: None
+	ErrorResponse 
+{
+    "error": {
+        "code": "UserError",
+        "message": "Could not find a model with valid score for metric 'AUC_weighted'. Please ensure that at least one run was successfully completed with a valid score for the given metric.",
+        "target": "metric",
+        "inner_error": {
+            "code": "NotFound",
+            "inner_error": {
+                "code": "ModelMissing"
+            }
+        }
+    }
+}
+Traceback:
+  File "telemetry_activity_logger.py", line 58, in _log_activity
+    yield
+  File "run.py", line 713, in get_output
+    activity_name=automl_shared_constants.TelemetryConstants.GET_OUTPUT
+  File "run.py", line 640, in _get_best_child_run
+    curr_run = self._get_run_internal(iteration, metric, "get_output")
+  File "run.py", line 804, in _get_run_internal
+    child_runs_and_scores = self._get_all_automl_child_runs(automl_settings.primary_metric)
+  File "run.py", line 852, in _get_all_automl_child_runs
+    raise AutoMLException._with_error(AzureMLError.create(ModelMissing, target="metric", metric=metric))
+
+ExceptionTarget: metric
+2021-08-17 03:01:42.682 - INFO - 5443 - azureml.train.automl.run._log_activity:93 - ActivityCompleted: Activity=GetOutput, HowEnded=Failure, Duration=2688.39[ms]
+2021-08-26 07:07:41.407 - INFO - 19687 - azureml.train.automl._local_managed_utils.is_docker_installed:354 - Docker is installed with Docker version 20.10.8, build 3967b7d
+.
+2021-08-26 07:07:41.418 - INFO - 19687 - azureml.train.automl.automlconfig._start_execution:217 - Submitting remote.
+2021-08-26 07:15:21.031 - INFO - 19687 - azureml.train.automl.run._log_activity:55 - ActivityStarted: GetOutput
+2021-08-26 07:15:21.048 - INFO - 19687 - azureml.train.automl.run._log_activity:55 - ActivityStarted: GetOutput
+2021-08-26 07:15:21.055 - INFO - 19687 - azureml.train.automl.run._log_activity:55 - ActivityStarted: GetChildren
+2021-08-26 07:15:21.662 - INFO - 19687 - azureml.train.automl.run._log_activity:55 - ActivityStarted: GetChildren
+2021-08-26 07:15:23.600 - CRITICAL - 19687 - azureml.train.automl.run.log_traceback:227 - Type: ModelMissing
+Class: AutoMLException
+Message: AutoMLException:
+	Message: Could not find a model with valid score for metric 'AUC_weighted'. Please ensure that at least one run was successfully completed with a valid score for the given metric.
+	InnerException: None
+	ErrorResponse 
+{
+    "error": {
+        "code": "UserError",
+        "message": "Could not find a model with valid score for metric 'AUC_weighted'. Please ensure that at least one run was successfully completed with a valid score for the given metric.",
+        "target": "metric",
+        "inner_error": {
+            "code": "NotFound",
+            "inner_error": {
+                "code": "ModelMissing"
+            }
+        }
+    }
+}
+Traceback:
+  File "telemetry_activity_logger.py", line 58, in _log_activity
+    yield
+  File "run.py", line 852, in _get_all_automl_child_runs
+    raise AutoMLException._with_error(AzureMLError.create(ModelMissing, target="metric", metric=metric))
+
+ExceptionTarget: metric
+2021-08-26 07:15:23.600 - INFO - 19687 - azureml.train.automl.run._log_activity:93 - ActivityCompleted: Activity=GetChildren, HowEnded=Failure, Duration=1938.12[ms]
+2021-08-26 07:15:23.602 - CRITICAL - 19687 - azureml.train.automl.run.log_traceback:227 - Type: ModelMissing
+Class: AutoMLException
+Message: AutoMLException:
+	Message: Could not find a model with valid score for metric 'AUC_weighted'. Please ensure that at least one run was successfully completed with a valid score for the given metric.
+	InnerException: None
+	ErrorResponse 
+{
+    "error": {
+        "code": "UserError",
+        "message": "Could not find a model with valid score for metric 'AUC_weighted'. Please ensure that at least one run was successfully completed with a valid score for the given metric.",
+        "target": "metric",
+        "inner_error": {
+            "code": "NotFound",
+            "inner_error": {
+                "code": "ModelMissing"
+            }
+        }
+    }
+}
+Traceback:
+  File "telemetry_activity_logger.py", line 58, in _log_activity
+    yield
+  File "run.py", line 804, in _get_run_internal
+    child_runs_and_scores = self._get_all_automl_child_runs(automl_settings.primary_metric)
+  File "run.py", line 852, in _get_all_automl_child_runs
+    raise AutoMLException._with_error(AzureMLError.create(ModelMissing, target="metric", metric=metric))
+
+ExceptionTarget: metric
+2021-08-26 07:15:23.602 - INFO - 19687 - azureml.train.automl.run._log_activity:93 - ActivityCompleted: Activity=GetChildren, HowEnded=Failure, Duration=2546.78[ms]
+2021-08-26 07:15:23.603 - CRITICAL - 19687 - azureml.train.automl.run.log_traceback:227 - Type: ModelMissing
+Class: AutoMLException
+Message: AutoMLException:
+	Message: Could not find a model with valid score for metric 'AUC_weighted'. Please ensure that at least one run was successfully completed with a valid score for the given metric.
+	InnerException: None
+	ErrorResponse 
+{
+    "error": {
+        "code": "UserError",
+        "message": "Could not find a model with valid score for metric 'AUC_weighted'. Please ensure that at least one run was successfully completed with a valid score for the given metric.",
+        "target": "metric",
+        "inner_error": {
+            "code": "NotFound",
+            "inner_error": {
+                "code": "ModelMissing"
+            }
+        }
+    }
+}
+Traceback:
+  File "telemetry_activity_logger.py", line 58, in _log_activity
+    yield
+  File "run.py", line 640, in _get_best_child_run
+    curr_run = self._get_run_internal(iteration, metric, "get_output")
+  File "run.py", line 804, in _get_run_internal
+    child_runs_and_scores = self._get_all_automl_child_runs(automl_settings.primary_metric)
+  File "run.py", line 852, in _get_all_automl_child_runs
+    raise AutoMLException._with_error(AzureMLError.create(ModelMissing, target="metric", metric=metric))
+
+ExceptionTarget: metric
+2021-08-26 07:15:23.603 - INFO - 19687 - azureml.train.automl.run._log_activity:93 - ActivityCompleted: Activity=GetOutput, HowEnded=Failure, Duration=2555.54[ms]
+2021-08-26 07:15:23.605 - CRITICAL - 19687 - azureml.train.automl.run.log_traceback:227 - Type: ModelMissing
+Class: AutoMLException
+Message: AutoMLException:
+	Message: Could not find a model with valid score for metric 'AUC_weighted'. Please ensure that at least one run was successfully completed with a valid score for the given metric.
+	InnerException: None
+	ErrorResponse 
+{
+    "error": {
+        "code": "UserError",
+        "message": "Could not find a model with valid score for metric 'AUC_weighted'. Please ensure that at least one run was successfully completed with a valid score for the given metric.",
+        "target": "metric",
+        "inner_error": {
+            "code": "NotFound",
+            "inner_error": {
+                "code": "ModelMissing"
+            }
+        }
+    }
+}
+Traceback:
+  File "telemetry_activity_logger.py", line 58, in _log_activity
+    yield
+  File "run.py", line 713, in get_output
+    activity_name=automl_shared_constants.TelemetryConstants.GET_OUTPUT
+  File "run.py", line 640, in _get_best_child_run
+    curr_run = self._get_run_internal(iteration, metric, "get_output")
+  File "run.py", line 804, in _get_run_internal
+    child_runs_and_scores = self._get_all_automl_child_runs(automl_settings.primary_metric)
+  File "run.py", line 852, in _get_all_automl_child_runs
+    raise AutoMLException._with_error(AzureMLError.create(ModelMissing, target="metric", metric=metric))
+
+ExceptionTarget: metric
+2021-08-26 07:15:23.605 - INFO - 19687 - azureml.train.automl.run._log_activity:93 - ActivityCompleted: Activity=GetOutput, HowEnded=Failure, Duration=2573.7[ms]
+2021-08-26 07:29:32.976 - INFO - 22450 - azureml.train.automl._local_managed_utils.is_docker_installed:354 - Docker is installed with Docker version 20.10.8, build 3967b7d
+.
+2021-08-26 07:29:32.983 - INFO - 22450 - azureml.train.automl.automlconfig._start_execution:217 - Submitting remote.
