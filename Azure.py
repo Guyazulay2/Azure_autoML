@@ -7,22 +7,23 @@ from azureml.data.dataset_factory import DataType
 import argparse
 from azureml.widgets import RunDetails
 
-
-parser = argparse.ArgumentParser()
-parser.add_argument('-file', type=str, help='Enter CSV file ')
-parser.add_argument('-name', type=str, help='Enter Dataset name')
-args = parser.parse_args()
-
-
 subscription_id = '05ed07e3-df05-46ff-8687-8555449022bb'
 resource_group = 'ML-resources'
 workspace_name = 'ML-resources'
 workspace = Workspace(subscription_id, resource_group, workspace_name)
 
 
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-file', type=str, help='Enter CSV file ')
+parser.add_argument('-name', type=str, help='Enter Dataset name')
+args = parser.parse_args()
+
+data_dir = 'data'
+if not os.path.isdir(data_dir):
+    os.mkdir(data_dir)
+
 datastore = workspace.get_default_datastore()
-
-
 datastore.upload(src_dir='data/', target_path=f'data/{args.file}')
 dataset = Dataset.Tabular.from_delimited_files(path = [(datastore, (f'data/{args.file}'))])
 file_ds = dataset.register(workspace=workspace, name=args.name, description='New Dataset Uploaded')
@@ -42,12 +43,14 @@ print("** Finisht Upload the data **")
 from azureml.core.experiment import Experiment
 from azureml.core.workspace import Workspace
 import pandas as pd
+import datetime
+
 
 d_date = datetime.datetime.now()
 reg_format_date = d_date.strftime("%Y-%m-%d--%H:%M:%S")
 
 ws = Workspace.from_config()
-experiment_name = f'{args.file[:-4]-{reg_format_date}}'
+experiment_name = f'{args.file[:-4]}'
 
 experiment = Experiment(ws, experiment_name)
 
@@ -83,6 +86,7 @@ print("** Finish Check  Gpu_cluster**")
 
 
 # In[12]:
+print("in Stage 12")
 
 
 from azureml.train.automl import AutoMLConfig
@@ -92,7 +96,7 @@ import logging
 automl_settings = {
     "experiment_timeout_hours": 0.3,
     "enable_early_stopping": True,
-    "iteration_timeout_minutes": 5,
+    "iteration_timeout_minutes": 8,
     "max_concurrent_iterations": 1,
     "max_cores_per_iteration": 1,
     "featurization": 'auto',
@@ -112,26 +116,25 @@ print("** Started now The train, whit 30 min **")
 
 
 # In[13]:
+print("in Stage 13")
 
+from time import sleep
 
 remote_run = experiment.submit(automl_config, show_output = False)
-
+sleep(120)
 
 # In[15]:
+print("in Stage 15")
 
 from azureml.widgets import RunDetails
 remote_run.wait_for_completion(show_output=True)
 print("** wait_for_completion **")
 
-
-# In[16]:
-
 best_run, fitted_model = remote_run.get_output()
-print(best_run)
-print(fitted_model)
 
 
 # In[18]:
+print("in Stage 18")
 
 from azureml.interpret import ExplanationClient
 from azureml.core.run import Run
@@ -141,14 +144,17 @@ model_explainability_run_id = remote_run.id + "_" + "ModelExplain"
 print(model_explainability_run_id)
 model_explainability_run = Run(experiment=experiment, run_id=model_explainability_run_id)
 model_explainability_run.wait_for_completion()
-
 # Get the best run object
 best_run, fitted_model = remote_run.get_output()
 
 
 # In[19]:
+print("in Stage 19")
 
 from azureml.interpret import ExplanationClient
+from azureml.widgets import RunDetails
+
+
 
 client = ExplanationClient.from_run(best_run)
 engineered_explanations = client.download_model_explanation(raw=True)
@@ -156,32 +162,59 @@ exp_data = engineered_explanations.get_feature_importance_dict()
 exp_data
 
 # In[20]:
+print("in Stage 20")
 
+# import datetime
+import os
+
+# d_date = datetime.datetime.now()
+# reg_format_date = d_date.strftime("%Y-%m-%d--%H:%M:%S")
 best_run, fitted_model = remote_run.get_output()
 
+metrics_dir = 'models_metrics'
+if not os.path.isdir(metrics_dir):
+    os.mkdir(metrics_dir)
+
+fileee = open(f"/home/guy/Azure_autoML/models_metrics/{args.file[:-4]}.txt", "w")
+fileee.write(f'{fitted_model}\n')
+fileee.close()
+
+best_run_metrics = best_run.get_metrics()
+for metric_name in best_run_metrics:
+    metric = best_run_metrics[metric_name]
+    file1 = open(f"/home/guy/Azure_autoML/models_metrics/{args.file[:-4]}.txt", "a") 
+    file1.write(f"\n-----------\n{metric_name}\n{metric}") 
+    file1.close()
+
+    # print(metric_name, metric)
+
+print("--- Saved all model metrics in txt file ---")
 
 # In[21]:
+print("in Stage 21")
+
 import datetime
 import os
 
-print("** Exporting The model **")
+print("** Exporting The model **\n------------")
 d_date = datetime.datetime.now()
 reg_format_date = d_date.strftime("%Y-%m-%d--%H:%M:%S")
 
 model_name = best_run.properties['model_name']
 script_file_name = 'inference/score.py'
 best_run.download_file('outputs/scoring_file_v_1_0_0.py', f'inference/{args.file[:-4]}score.py')
-model_dir = 'Model' # Local folder where the model will be stored temporarily
+model_dir = 'Models' # Local folder where the model will be stored temporarily
 if not os.path.isdir(model_dir):
     os.mkdir(model_dir)
-    
+
 best_run.download_file('outputs/model.pkl', f'{model_dir}/{args.file[:-4]}-{reg_format_date}.pkl')
 
 
 # In[22]:
+print("in Stage 22")
 
 
 description = 'AutoML Model trained'
 tags = None
 model = remote_run.register_model(model_name = model_name, description = description, tags = tags)
-print(remote_run.model_id)
+print("Finished.")
