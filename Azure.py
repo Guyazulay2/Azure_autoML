@@ -6,6 +6,7 @@ from azureml.core import Workspace, Dataset
 from azureml.data.dataset_factory import DataType
 import argparse
 from azureml.widgets import RunDetails
+import os
 
 subscription_id = '05ed07e3-df05-46ff-8687-8555449022bb'
 resource_group = 'ML-resources'
@@ -144,7 +145,6 @@ model_explainability_run_id = remote_run.id + "_" + "ModelExplain"
 print(model_explainability_run_id)
 model_explainability_run = Run(experiment=experiment, run_id=model_explainability_run_id)
 model_explainability_run.wait_for_completion()
-# Get the best run object
 best_run, fitted_model = remote_run.get_output()
 
 
@@ -186,7 +186,6 @@ for metric_name in best_run_metrics:
     file1.write(f"\n-----------\n{metric_name}\n{metric}") 
     file1.close()
 
-    # print(metric_name, metric)
 
 print("--- Saved all model metrics in txt file ---")
 
@@ -203,7 +202,7 @@ reg_format_date = d_date.strftime("%Y-%m-%d--%H:%M:%S")
 model_name = best_run.properties['model_name']
 script_file_name = 'inference/score.py'
 best_run.download_file('outputs/scoring_file_v_1_0_0.py', f'inference/{args.file[:-4]}score.py')
-model_dir = 'Models' # Local folder where the model will be stored temporarily
+model_dir = 'Models'
 if not os.path.isdir(model_dir):
     os.mkdir(model_dir)
 
