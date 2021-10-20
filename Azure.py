@@ -8,9 +8,9 @@ import argparse
 from azureml.widgets import RunDetails
 import os
 
-subscription_id = '05ed07e3-df05-46ff-8687-8555449022bb'
-resource_group = 'ML-resources'
-workspace_name = 'ML-resources'
+subscription_id = 'def7fc39-4b18-4efa-a893-680f4efebe2c'
+resource_group = 'New_subscription'
+workspace_name = 'automl_happy'
 workspace = Workspace(subscription_id, resource_group, workspace_name)
 
 
@@ -27,7 +27,7 @@ if not os.path.isdir(data_dir):
 datastore = workspace.get_default_datastore()
 datastore.upload(src_dir='data/', target_path=f'data/{args.file}')
 dataset = Dataset.Tabular.from_delimited_files(path = [(datastore, (f'data/{args.file}'))])
-file_ds = dataset.register(workspace=workspace, name=args.name, description='New Dataset Uploaded')
+file_ds = dataset.register(workspace=workspace, name=args.name, description='New Dataset Uploaded', create_new_version = True)
 
 
 # dataset = Dataset.get_by_name(workspace, name='new_csv_test')
@@ -72,7 +72,7 @@ outputDf.T
 from azureml.core.compute import ComputeTarget, AmlCompute
 from azureml.core.compute_target import ComputeTargetException
 
-cpu_cluster_name = "GPU-compute"
+cpu_cluster_name = "CPU-compute"
 
 try:
     compute_target = ComputeTarget(workspace=ws, name=cpu_cluster_name)
@@ -92,7 +92,6 @@ print("in Stage 12")
 
 from azureml.train.automl import AutoMLConfig
 import logging
-
 
 automl_settings = {
     "experiment_timeout_hours": 0.3,
@@ -118,7 +117,6 @@ print("** Started now The train, whit 30 min **")
 
 # In[13]:
 print("in Stage 13")
-
 from time import sleep
 
 remote_run = experiment.submit(automl_config, show_output = False)
