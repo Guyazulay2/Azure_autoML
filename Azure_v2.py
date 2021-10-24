@@ -32,7 +32,7 @@ dataset = Dataset.Tabular.from_delimited_files(path = [(datastore, (f'Azure_auto
 file_ds = dataset.register(workspace=workspace, name=args.name, description='New Dataset Uploaded', create_new_version = True)
 
 
-# dataset = Dataset.get_by_name(workspace, name='new_csv_test')
+## dataset = Dataset.get_by_name(workspace, name='new_csv_test')
 # dataset.to_pandas_dataframe()
 
 # "C:\Users\User\Desktop\vscode\Azure_autoML"
