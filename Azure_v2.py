@@ -97,9 +97,9 @@ import logging
 
 
 automl_settings = {
-    "experiment_timeout_hours": 1.0,
+    "experiment_timeout_hours": 1.3,
     "enable_early_stopping": False,
-    "iteration_timeout_minutes": 15,
+    "iteration_timeout_minutes": 30,
     "max_concurrent_iterations": 2,
     "max_cores_per_iteration": -1,
     "featurization": 'auto',
@@ -107,15 +107,16 @@ automl_settings = {
 }
 
 automl_config = AutoMLConfig(task = 'classification',
-                             primary_metric= "AUC_weighted",
+                             primary_metric= 'AUC_weighted',
+                             model_explainability=True,
                              compute_target=compute_target,
                              blocked_models=['XGBoostClassifier'],
-                             label_column_name = '0',
                              training_data = dataset,
+                             label_column_name='0',
                              n_cross_validations=10,
                              **automl_settings
                             )
-print("** Started now The train, wait 3 Hours **")
+print("** Started now The train, whit 80 min **")
 
 
 # In[13]:
@@ -124,18 +125,16 @@ print("in Stage 13")
 from time import sleep
 
 remote_run = experiment.submit(automl_config, show_output = False)
-sleep(30)
+sleep(120)
 
 # In[15]:
 print("in Stage 15")
 
 from azureml.widgets import RunDetails
-remote_run.wait_for_completion(show_output=True, wait_post_processing=True)
+remote_run.wait_for_completion(show_output=True)
 print("** wait_for_completion **")
 
 best_run, fitted_model = remote_run.get_output()
-best_run_metrics = best_run.get_metrics()
-
 
 # In[18]:
 print("in Stage 18")
@@ -145,11 +144,10 @@ from azureml.core.run import Run
 
 print("Wait for the best model explanation run to complete")
 model_explainability_run_id = remote_run.id + "_" + "ModelExplain"
-#print(model_explainability_run_id)
+print(model_explainability_run_id)
 model_explainability_run = Run(experiment=experiment, run_id=model_explainability_run_id)
-model_explainability_run.wait_for_completion(wait_post_processing=True)
+model_explainability_run.wait_for_completion()
 best_run, fitted_model = remote_run.get_output()
-print("best_run :",best_run)
 
 # In[19]:
 from time import sleep
@@ -160,9 +158,8 @@ from azureml.widgets import RunDetails
 from azureml.core.run import Run
 
 
-sleep(100)
 client = ExplanationClient.from_run(best_run)
-engineered_explanations = client.download_model_explanation()
+engineered_explanations = client.download_model_explanation(raw=True)
 exp_data = engineered_explanations.get_feature_importance_dict()
 exp_data
 
