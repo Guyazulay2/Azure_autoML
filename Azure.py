@@ -2,18 +2,20 @@
 # coding: utf-8
 
 # In[47]:
+from enum import auto
 from azureml.core import Workspace, Dataset
 from azureml.data.dataset_factory import DataType
 import argparse
+from azureml.core.authentication import InteractiveLoginAuthentication
 from azureml.widgets import RunDetails
 import os
 
-subscription_id = 'def7fc39-4b18-4efa-a893-680f4efebe2c'
+
+ti = InteractiveLoginAuthentication(tenant_id='2e3734a5-13a8-4988-9236-1c8efdf5cdca')
+subscription_id = "def7fc39-4b18-4efa-a893-680f4efebe2c"
 resource_group = 'New_subscription'
 workspace_name = 'automl_happy'
-workspace = Workspace(subscription_id, resource_group, workspace_name)
-
-
+workspace = Workspace(subscription_id, resource_group, workspace_name,auth=ti)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-file', type=str, help='Enter CSV file ')
@@ -21,13 +23,13 @@ parser.add_argument('-val', type=str, help='Enter Validate data name')
 parser.add_argument('-name', type=str, help='Enter Dataset name')
 args = parser.parse_args()
 
-data_dir = 'data'
+data_dir = 'C:/Users/User/Desktop/vscode/Azure_autoML/data'
 if not os.path.isdir(data_dir):
     os.mkdir(data_dir)
 
 datastore = workspace.get_default_datastore()
-datastore.upload(src_dir='data/', target_path=f'data/{args.file}')
-dataset = Dataset.Tabular.from_delimited_files(path = [(datastore, (f'data/{args.file}'))])
+datastore.upload(src_dir='Azure_autoML/data', target_path=f'Azure_autoML/data/{args.file}')
+dataset = Dataset.Tabular.from_delimited_files(path = [(datastore, (f'Azure_autoML/data/{args.file}'))])
 file_ds = dataset.register(workspace=workspace, name=args.name, description='New Dataset Uploaded', create_new_version = True)
 
 
@@ -50,7 +52,7 @@ import datetime
 d_date = datetime.datetime.now()
 reg_format_date = d_date.strftime("%Y-%m-%d--%H:%M:%S")
 
-ws = Workspace.from_config()
+ws = Workspace.from_config(path="C:/Users/User/Desktop/vscode/Azure_autoML")
 experiment_name = f'{args.file[:-4]}'
 
 experiment = Experiment(ws, experiment_name)
@@ -91,6 +93,7 @@ print("in Stage 12")
 from azureml.train.automl import AutoMLConfig
 import logging
 
+
 automl_settings = {
     "experiment_timeout_hours": 0.3,
     "enable_early_stopping": False,
@@ -126,6 +129,7 @@ remote_run.wait_for_completion(show_output=True)
 print("** wait_for_completion **")
 
 best_run, fitted_model = remote_run.get_output()
+best_run_metrics = best_run.get_metrics()
 
 print("best_run ****** :", best_run)
 print("=======================")
@@ -136,7 +140,7 @@ from azureml.core.run import Run
 
 print("Wait for the best model explanation run to complete")
 model_explainability_run_id = remote_run.id + "_" + "ModelExplain"
-print(model_explainability_run_id)
+#print(model_explainability_run_id)
 model_explainability_run = Run(experiment=experiment, run_id=model_explainability_run_id)
 model_explainability_run.wait_for_completion()
 best_run, fitted_model = remote_run.get_output()
@@ -153,6 +157,7 @@ engineered_explanations = client.download_model_explanation(raw=True)
 exp_data = engineered_explanations.get_feature_importance_dict()
 exp_data
 
+
 # In[20]:
 print("in Stage 20")
 
@@ -163,7 +168,7 @@ import os
 # reg_format_date = d_date.strftime("%Y-%m-%d--%H:%M:%S")
 best_run, fitted_model = remote_run.get_output()
 
-metrics_dir = 'models_metrics'
+metrics_dir = 'C:/Users/User/Desktop/vscode/Azure_autoML/models_metrics'
 if not os.path.isdir(metrics_dir):
     os.mkdir(metrics_dir)
 
@@ -193,8 +198,9 @@ reg_format_date = d_date.strftime("%Y-%m-%d--%H:%M:%S")
 model_name = best_run.properties['model_name']
 
 script_file_name = 'inference/score.py'
-best_run.download_file('outputs/scoring_file_v_1_0_0.py', f'inference/{args.file[:-4]}score.py')
-model_dir = 'Models'
+best_run.download_file('outputs/scoring_file_v_1_0_0.py', f'C:/Users/User/Desktop/vscode/Azure_autoML/inference/{args.file[:-4]}score.py')
+model_dir='Models'
+
 if not os.path.isdir(model_dir):
     os.mkdir(model_dir)
 try:

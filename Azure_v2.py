@@ -113,6 +113,7 @@ automl_settings = {
 
 automl_config = AutoMLConfig(task = 'classification',
                              primary_metric= 'AUC_weighted',
+                             model_explainability=True,
                              compute_target=compute_target,
                              blocked_models=['XGBoostClassifier'],
                              label_column_name = '0',
@@ -120,7 +121,7 @@ automl_config = AutoMLConfig(task = 'classification',
                              validation_data = validation_data,
                              **automl_settings
                             )
-print("** Started now The train, wait 30 min **")
+print("** Started now The train, whit 80 min **")
 
 
 # In[13]:
@@ -129,7 +130,7 @@ print("in Stage 13")
 from time import sleep
 
 remote_run = experiment.submit(automl_config, show_output = False)
-sleep(100)
+sleep(120)
 
 # In[15]:
 print("in Stage 15")
@@ -139,7 +140,6 @@ remote_run.wait_for_completion(show_output=True, wait_post_processing=True)
 print("** wait_for_completion **")
 
 best_run, fitted_model = remote_run.get_output()
-
 
 # In[18]:
 print("in Stage 18")
@@ -154,19 +154,20 @@ model_explainability_run = Run(experiment=experiment, run_id=model_explainabilit
 model_explainability_run.wait_for_completion(wait_post_processing=True)
 best_run, fitted_model = remote_run.get_output()
 
-
 # In[19]:
+from time import sleep
 print("in Stage 19")
 
 from azureml.interpret import ExplanationClient
 from azureml.widgets import RunDetails
-
+from azureml.core.run import Run
 
 
 client = ExplanationClient.from_run(best_run)
 engineered_explanations = client.download_model_explanation(raw=True)
 exp_data = engineered_explanations.get_feature_importance_dict()
 exp_data
+
 
 # In[20]:
 print("in Stage 20")
