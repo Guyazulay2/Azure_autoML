@@ -32,6 +32,11 @@ dataset = Dataset.Tabular.from_delimited_files(path = [(datastore, (f'Azure_auto
 file_ds = dataset.register(workspace=workspace, name=args.name, description='New Dataset Uploaded', create_new_version = True)
 
 
+datastore = workspace.get_default_datastore()
+datastore.upload(src_dir='data/', target_path=f'data/{args.val}')
+val_data = Dataset.Tabular.from_delimited_files(path = [(datastore, (f'data/{args.val}'))])
+validation_data = val_data.register(workspace=workspace, name=args.name, description='New Data validation Uploaded', create_new_version = True)
+
 ## dataset = Dataset.get_by_name(workspace, name='new_csv_test')
 # dataset.to_pandas_dataframe()
 
@@ -97,11 +102,11 @@ import logging
 
 
 automl_settings = {
-    "experiment_timeout_hours": 0.6,
+    "experiment_timeout_hours": 1.0,
     "enable_early_stopping": True,
-    "iteration_timeout_minutes": 10,
-    "max_concurrent_iterations": 1,
-    "max_cores_per_iteration": 1,
+    "iteration_timeout_minutes": 15,
+    "max_concurrent_iterations": 2,
+    "max_cores_per_iteration": -1,
     "featurization": 'auto',
     "verbosity": logging.INFO,
 }
@@ -109,10 +114,10 @@ automl_settings = {
 automl_config = AutoMLConfig(task = 'classification',
                              primary_metric= 'AUC_weighted',
                              compute_target=compute_target,
-                             blocked_models=['TensorFlowLinearClassifier','XGBoostClassifier'],
+                             blocked_models=['XGBoostClassifier'],
                              label_column_name = '0',
                              training_data = dataset,
-                             n_cross_validations=10,
+                             validation_data = validation_data,
                              **automl_settings
                             )
 print("** Started now The train, wait 30 min **")
@@ -130,7 +135,7 @@ sleep(100)
 print("in Stage 15")
 
 from azureml.widgets import RunDetails
-remote_run.wait_for_completion(show_output=True)
+remote_run.wait_for_completion(show_output=True, wait_post_processing=True)
 print("** wait_for_completion **")
 
 best_run, fitted_model = remote_run.get_output()
@@ -146,7 +151,7 @@ print("Wait for the best model explanation run to complete")
 model_explainability_run_id = remote_run.id + "_" + "ModelExplain"
 print(model_explainability_run_id)
 model_explainability_run = Run(experiment=experiment, run_id=model_explainability_run_id)
-model_explainability_run.wait_for_completion()
+model_explainability_run.wait_for_completion(wait_post_processing=True)
 best_run, fitted_model = remote_run.get_output()
 
 
@@ -165,7 +170,6 @@ exp_data
 
 # In[20]:
 print("in Stage 20")
-
 # import datetime
 import os
 
