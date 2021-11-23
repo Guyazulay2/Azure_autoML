@@ -19,6 +19,7 @@ workspace = Workspace(subscription_id, resource_group, workspace_name,auth=ti)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-file', type=str, help='Enter CSV file ')
+parser.add_argument('-val', type=str, help='Enter Validate data name')
 parser.add_argument('-name', type=str, help='Enter Dataset name')
 args = parser.parse_args()
 
