@@ -23,13 +23,13 @@ parser.add_argument('-val', type=str, help='Enter Validate data name')
 parser.add_argument('-name', type=str, help='Enter Dataset name')
 args = parser.parse_args()
 
-data_dir = 'C:/Users/User/Desktop/vscode/Azure_autoML/data'
+data_dir = 'data'
 if not os.path.isdir(data_dir):
     os.mkdir(data_dir)
 
 datastore = workspace.get_default_datastore()
-datastore.upload(src_dir='Azure_autoML/data', target_path=f'Azure_autoML/data/{args.file}')
-dataset = Dataset.Tabular.from_delimited_files(path = [(datastore, (f'Azure_autoML/data/{args.file}'))])
+datastore.upload(src_dir='data/', target_path=f'data/{args.file}')
+dataset = Dataset.Tabular.from_delimited_files(path = [(datastore, (f'data/{args.file}'))])
 file_ds = dataset.register(workspace=workspace, name=args.name, description='New Dataset Uploaded', create_new_version = True)
 
 
@@ -52,7 +52,7 @@ import datetime
 d_date = datetime.datetime.now()
 reg_format_date = d_date.strftime("%Y-%m-%d--%H:%M:%S")
 
-ws = Workspace.from_config(path="C:/Users/User/Desktop/vscode/Azure_autoML")
+ws = Workspace.from_config(path="/home/guy/Desktop/Azure_autoML")
 experiment_name = f'{args.file[:-4]}'
 
 experiment = Experiment(ws, experiment_name)
@@ -89,13 +89,14 @@ print("** Finish Check  CPU_cluster**")
 # In[12]:
 print("in Stage 12")
 
+from time import sleep
 
 from azureml.train.automl import AutoMLConfig
 import logging
 
 
 automl_settings = {
-    "experiment_timeout_hours": 0.3,
+    "experiment_timeout_hours": 1.1,
     "enable_early_stopping": False,
     "iteration_timeout_minutes": 10,
     "max_concurrent_iterations": 2,
@@ -109,15 +110,13 @@ automl_config = AutoMLConfig(task = 'classification',
                              model_explainability=True,
                              compute_target=compute_target,
                              blocked_models=['XGBoostClassifier'],
+                             label_column_name = '0',
                              training_data = dataset,
-                             validation_data = validation_data,
-                             n_cross_validations=10,
+                             validation_data = val_data,
+                            #  n_cross_validations=10,
                              **automl_settings
                             )
 print("** Started now The train, whit 80 min **")
-
-from time import sleep
-
 remote_run = experiment.submit(automl_config, show_output = False)
 sleep(60)
 
@@ -131,10 +130,10 @@ print("** wait_for_completion **")
 best_run, fitted_model = remote_run.get_output()
 best_run_metrics = best_run.get_metrics()
 
-print("best_run ****** :", best_run)
-print("=======================")
-print("fitted_model ****** :", fitted_model)
-
+#print("best_run ****** :", best_run)
+#print("=======================")
+#print("fitted_model ****** :", fitted_model)
+ד
 from azureml.interpret import ExplanationClient
 from azureml.core.run import Run
 
@@ -160,7 +159,6 @@ exp_data
 
 # In[20]:
 print("in Stage 20")
-
 # import datetime
 import os
 
@@ -168,7 +166,7 @@ import os
 # reg_format_date = d_date.strftime("%Y-%m-%d--%H:%M:%S")
 best_run, fitted_model = remote_run.get_output()
 
-metrics_dir = 'C:/Users/User/Desktop/vscode/Azure_autoML/models_metrics'
+metrics_dir = '/home/guy/Desktop/Azure_autoML/models_metrics'
 if not os.path.isdir(metrics_dir):
     os.mkdir(metrics_dir)
 
@@ -182,7 +180,6 @@ for metric_name in best_run_metrics:
     file1 = open(f"/home/guy/Desktop/Azure_autoML/models_metrics/{args.file[:-4]}.txt", "a") 
     file1.write(f"\n-----------\n{metric_name}\n{metric}") 
     file1.close()
-
 
 print("--- Saved all model metrics in txt file ---")
 
@@ -198,7 +195,7 @@ reg_format_date = d_date.strftime("%Y-%m-%d--%H:%M:%S")
 model_name = best_run.properties['model_name']
 
 script_file_name = 'inference/score.py'
-best_run.download_file('outputs/scoring_file_v_1_0_0.py', f'C:/Users/User/Desktop/vscode/Azure_autoML/inference/{args.file[:-4]}score.py')
+best_run.download_file('outputs/scoring_file_v_1_0_0.py', f'/home/guy/Desktop/Azure_autoML/inference/{args.file[:-4]}score.py')
 model_dir='Models'
 
 if not os.path.isdir(model_dir):
@@ -213,23 +210,4 @@ tags = None
 model = remote_run.register_model(model_name = model_name, description = description, tags = tags)
 print(remote_run.model_id)
 
-# # In[21]:
-# print("in Stage 22")
-
-# from azureml.core.model import InferenceConfig
-# from azureml.core.webservice import AciWebservice
-# from azureml.core.model import Model
-
-# inference_config = InferenceConfig(entry_script=script_file_name)
-# aciconfig = AciWebservice.deploy_configuration(cpu_cores = 2, 
-#                                                memory_gb = 2, 
-#                                                tags = {'area': "bmData", 'type': "automl_classification"}, 
-#                                                description = 'sample service for Automl Classification')
-
-# aci_service_name = args.file[:-4]
-# print(aci_service_name)
-# aci_service = Model.deploy(ws, aci_service_name, [model], inference_config, aciconfig)
-# aci_service.wait_for_deployment(True)
-# print(aci_service.state)
-# aci_service.get_logs()
-
+# %%
